@@ -1,6 +1,5 @@
 "use strict";
 const jsdom = require('jsdom');
-const request = require('request');
 
 const jsdomModule = require.cache[require.resolve('jsdom')];
 const jsdomUtils = jsdomModule.require("./jsdom/utils");
