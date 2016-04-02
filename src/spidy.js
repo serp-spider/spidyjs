@@ -52,7 +52,7 @@ exports.request = function (url, config) {
             body: config.body || null,
 
             gzip: true,
-            jar: config.cookieJar 
+            jar: config.cookieJar
         };
 
         if (config.proxy) {
