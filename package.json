@@ -1,7 +1,7 @@
 {
   "name": "spidy",
-  "version": "2.0.0",
-  "description": "Dead simple wrapper arround jsdom to offer missing features of jsdom needed for SERPS: the PHP SERP Spider",
+  "version": "2.0.1",
+  "description": "Dead simple wrapper arround jsdom to offer a different headless browser experience",
   "main": "src/spidy.js",
   "scripts": {
     "test": "mocha"
