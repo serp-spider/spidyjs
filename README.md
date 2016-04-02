@@ -37,12 +37,12 @@ spidy.request('http://httpbin.org/ip', {
 });
 ```
 
-And call it with spidy: 
+and call it with from the command line with ``spidyjs``: 
 
 ``$ spidyjs file.js``
 
 **Important notice**: by default external resources (javascript, images...) are not processed; 
-see [#enable-external-resources] for more details.
+see (enable external resources)[#enable-external-resources] for more details.
 
 Api
 ---
@@ -80,10 +80,18 @@ Setting to `"xml"` will attempt to parse the document as an XHTML document. (jsd
 - `config.src`: an array of JavaScript strings that will be evaluated against the resulting document. Similar to `scripts`, but it accepts JavaScript instead of paths/URLs.
 
 
+**Post data**
+
 For convenience a ``spidy.post(url, formData, config)`` method is also available:
 
 ```js
-spidy.post('http://httpbin.org/post', {'foo': 'bar}, config);
+var spidy = require('spidy');
+
+spidy.post('http://httpbin.org/post', {'foo': 'bar'}, {
+    done: function(error, window){
+        console.log(window.document.documentElement.innerHTML);
+    }
+});
 ``` 
 It's simply a shortcut for ``spidy.request``, and it will set ``config.method = 'POST'`` and ``config.formData = formData``.
 
@@ -102,9 +110,9 @@ To enable javascripts (at your own risks) add the following ``features`` to the 
 
 ```json
 features: {
-    FetchExternalResources: ["script"],
-    ProcessExternalResources: ["script"],
-    SkipExternalResources: false
+    "FetchExternalResources": ["script"],
+    "ProcessExternalResources": ["script"],
+    "SkipExternalResources": false
 }
 ```
 
@@ -114,15 +122,17 @@ Use a timeout
 When invoking spidy you can use a timeout:
 
 ```sh
-$ spidyjs --timeout 5000 file.js
+$ spidyjs --timeout=5000 file.js
 ```
 
 This example will fail if ``file.js`` is longer than 5sec (5000ms) to execute.
 
+The **default timeout** is 120secs.
+
 Use command line args
 ---------------------
 
-You can get args passed to the command line from your javascript file:
+In the script file, it is possible to get additional arguments passed on the command line.
 
 ```js
 var spidy = require('spidy');
