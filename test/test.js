@@ -11,6 +11,7 @@ describe('Spidy module', function() {
                 done: function(err, window){
 
                     if(err){
+                        console.log(err);
                         done('Http call failed');
                         return false;
                     }else{

@@ -1,12 +1,6 @@
 "use strict";
-const jsdom = require('jsdom');
-
-const jsdomModule = require.cache[require.resolve('jsdom')];
-const jsdomUtils = jsdomModule.require("./jsdom/utils");
-const parseContentType = jsdomUtils.parseContentType;
-
-const resourceLoader = jsdomModule.require("./jsdom/browser/resource-loader");
-
+var jsdom = require('jsdom');
+var request = require('request');
 
 function reportInitError(err, config) {
     if (config.created) {
@@ -19,7 +13,7 @@ function reportInitError(err, config) {
 
 
 exports.request = function (url, config) {
-    let req = null;
+    var req = null;
 
     config = config || {};
 
@@ -38,7 +32,9 @@ exports.request = function (url, config) {
             config.userAgent = "Mozilla/5.0 Chrome/10.0.613.0 Safari/534.15 spidy/" + version;
         }
 
-        const options = {
+
+        var options = {
+            uri: config.url,
             encoding: config.encoding || "utf8",
             headers: config.headers || {},
             pool: config.pool !== undefined ? config.pool : {
@@ -51,8 +47,12 @@ exports.request = function (url, config) {
             strictSSL: config.strictSSL !== undefined ? config.strictSSL : true,
             method: config.method || 'GET',
             userAgent: config.userAgent,
+
             formData: config.formData || null,
-            body: config.body || null
+            body: config.body || null,
+
+            gzip: true,
+            jar: config.cookieJar 
         };
 
         if (config.proxy) {
@@ -66,8 +66,11 @@ exports.request = function (url, config) {
     }
 
     function handleUrl() {
-        config.cookieJar = config.cookieJar || jsdom.createCookieJar();
-        return resourceLoader.download(config.url, createOption(), config.cookieJar, null, function(err, responseText, res) {
+        config.cookieJar = config.cookieJar || true;
+
+
+
+        return request(createOption(), function (err, res, responseText) {
             if (err) {
                 reportInitError(err, config);
                 return;
@@ -75,18 +78,18 @@ exports.request = function (url, config) {
 
             // The use of `res.request.uri.href` ensures that `window.location.href`
             // is updated when `request` follows redirects.
-            config.html = responseText;
+            config.html = responseText || '';
             config.url = res.request.uri.href;
+
+            if (config.parsingMode === "auto" && (
+                res.headers["content-type"] === "application/xml" ||
+                res.headers["content-type"] === "text/xml" ||
+                res.headers["content-type"] === "application/xhtml+xml")) {
+                config.parsingMode = "xml";
+            }
 
             if (res.headers["last-modified"]) {
                 config.lastModified = new Date(res.headers["last-modified"]);
-            }
-
-            if (config.parsingMode === "auto") {
-                const contentType = parseContentType(res.headers["content-type"]);
-                if (contentType && contentType.isXML()) {
-                    config.parsingMode = "xml";
-                }
             }
 
             if(config.file){
@@ -95,7 +98,6 @@ exports.request = function (url, config) {
 
             jsdom.env(config);
         });
-
 
     }
     return req;
