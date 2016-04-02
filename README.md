@@ -3,6 +3,9 @@ SpidyJS
 
 A headless browser built for [SERPS](https://serp-spider.github.io/).
 
+[![Build Status](https://travis-ci.org/serp-spider/spidyjs.svg?branch=master)](https://travis-ci.org/serp-spider/spidyjs)
+[![npm version](https://badge.fury.io/js/spidy.svg)](https://badge.fury.io/js/spidy)
+
 It's a - 100% javascript - no gui - browser. 
 It is actually a dead simple wrapper around [jsdom](https://github.com/tmpvar/jsdom).
 Its goal is to add the missing features to make it easy to use for SERPS, but it can be used for any other purpose. 
