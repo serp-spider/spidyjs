@@ -74,7 +74,7 @@ if(!jsFile){
     setTimeout(function(){
         proc.kill();
 
-        console.log(`Timeout of ${timeout/1000}sec reached`);
+        console.log("Timeout of " + timeout/1000 + "sec reached");
         process.exit(1);
     }, timeout);
 }

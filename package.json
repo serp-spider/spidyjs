@@ -1,6 +1,6 @@
 {
   "name": "spidy",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Dead simple wrapper arround jsdom to offer missing features of jsdom needed for SERPS: the PHP SERP Spider",
   "main": "src/spidy.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "url": "https://github.com/serp-spider/spidyjs/issues"
   },
   "dependencies": {
-    "jsdom": "^8.2",
+    "jsdom": "^3.1.2",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
