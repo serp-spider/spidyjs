@@ -35,7 +35,7 @@ exports.request = function (url, config) {
     function createOption() {
 
         if(!config.userAgent){
-            var version = require('./package.json').version;
+            var version = require('../package.json').version;
             config.userAgent = "Mozilla/5.0 Chrome/10.0.613.0 Safari/534.15 spidy/" + version;
         }
 

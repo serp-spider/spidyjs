@@ -29,7 +29,7 @@ internalArgs = minimist(internalArgs);
 
 // Print version and exit
 if(internalArgs.v || internalArgs.version){
-    var version = require('./package.json').version;
+    var version = require('../package.json').version;
     console.log(version);
     process.exit();
 }
