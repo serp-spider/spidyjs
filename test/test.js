@@ -1,5 +1,5 @@
 var chai = require('chai');
-var spidy = require('spidy');
+var spidy = require('../src/spidy');
 
 chai.should();
 

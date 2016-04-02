@@ -4,4 +4,3 @@ sudo: false
 
 before_script:
   - travis_retry npm install -g mocha
-  - travis_retry npm install -g
