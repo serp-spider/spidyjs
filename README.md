@@ -58,6 +58,7 @@ the following items (mostly the same that the ones from jsdom):
 - `config.method`: The http method to use (POST, GET, PUT...) default to ``GET``.
 - `config.proxy`: A proxy to use for the requests with the form: ``http[s]://ip:port``
 - `config.formData`: data to be sent with the request, useful for post queries.
+- `config.body`: the http body for ``POST`` or ``PUT`` queries.
 - `config.cookieJar`: cookie jar which will be used by document and related resource requests. Can be created by `jsdom.createCookieJar()` method. Useful to share cookie state among different documents as browsers does.
 - `config.parsingMode`: either `"auto"`, `"html"`, or `"xml"`. The default is `"auto"`, 
 which uses HTML behavior unless `config.url` responds with an XML `Content-Type`. 

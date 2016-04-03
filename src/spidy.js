@@ -50,16 +50,15 @@ exports.request = function (url, config) {
             },
             strictSSL: config.strictSSL !== undefined ? config.strictSSL : true,
             method: config.method || 'GET',
-            userAgent: config.userAgent
+            userAgent: config.userAgent,
+            formData: config.formData || null,
+            body: config.body || null
         };
 
         if (config.proxy) {
             options.proxy = config.proxy;
         }
 
-        if (config.formData) {
-            options.formData = config.formData;
-        }
 
         options.headers["User-Agent"] = config.userAgent;
 

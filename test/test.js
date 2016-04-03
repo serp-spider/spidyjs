@@ -44,28 +44,31 @@ describe('Spidy module', function() {
 
 
 describe('Spidyjs binary', function() {
+
+    var spidyBin = function(args, done){
+        args.unshift('./src/index.js');
+        var output = '';
+
+        var proc = spawn('node', args, {});
+
+        // process output
+        proc.stdout.on('data', function(data){
+            output += data.toString('utf8');
+        });
+
+        proc.stderr.on('data', function(data){
+            output += data.toString('utf8');
+        });
+        proc.on('close', function(code){
+            done(output, code);
+        });
+    };
+
     describe('http method', function() {
-        var spidyBin = function(args, done){
-            args.unshift('./src/index.js');
-            var output = '';
 
-            var proc = spawn('node', args, {});
-
-            // process output
-            proc.stdout.on('data', function(data){
-                output += data.toString('utf8');
-            });
-
-            proc.stderr.on('data', function(data){
-                output += data.toString('utf8');
-            });
-            proc.on('close', function(code){
-                done(output, code);
-            });
-        };
 
         it('get', function (done) {
-            spidyBin(['./test/resources/json.js', 'http://httpbin.org/get?foo=bar'], function(data, code){
+            spidyBin(['./test/resources/json_formdata.js', 'http://httpbin.org/get?foo=bar'], function(data, code){
 
                 code.should.equal(0, data);
 
@@ -78,10 +81,25 @@ describe('Spidyjs binary', function() {
         });
 
         it('post', function (done) {
-            spidyBin(['./test/resources/json.js', 'http://httpbin.org/post', 'POST', '{"foo":"bar"}'], function(data, code){
+            spidyBin(['./test/resources/json_formdata.js', 'http://httpbin.org/post', 'POST', '{"foo":"bar"}'], function(data, code){
 
                 code.should.equal(0, data);
 
+                data = JSON.parse(data);
+                Object.keys(data.form).should.have.length(1);
+                data.form['foo'].should.equal('bar');
+
+                done();
+            });
+        });
+    });
+
+    describe('config', function() {
+
+        it('body', function (done) {
+            spidyBin(['./test/resources/json_body.js', 'http://httpbin.org/post', 'POST', 'foo=bar'], function(data, code){
+
+                code.should.equal(0, data);
                 data = JSON.parse(data);
                 Object.keys(data.form).should.have.length(1);
                 data.form['foo'].should.equal('bar');
