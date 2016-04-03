@@ -5,7 +5,7 @@ const jsdomModule = require.cache[require.resolve('jsdom')];
 const jsdomUtils = jsdomModule.require("./jsdom/utils");
 const parseContentType = jsdomUtils.parseContentType;
 
-const resourceLoader = jsdomModule.require("./jsdom/browser/resource-loader");
+var request = require('request');
 
 
 function reportInitError(err, config) {
@@ -36,19 +36,27 @@ exports.request = function (url, config, done) {
         config.done = done;
     }
 
+    config.cookieJar = config.cookieJar || jsdom.createCookieJar();
+
     config.url = url;
     req = handleUrl();
 
     return req;
 
+    function wrapCookieJarForRequest(cookieJar) {
+        const jarWrapper = request.jar();
+        jarWrapper._jar = cookieJar;
+        return jarWrapper;
+    }
+
     function createOption() {
 
         if(!config.userAgent){
-            var version = require('../package.json').version;
-            config.userAgent = "Mozilla/5.0 Chrome/10.0.613.0 Safari/534.15 spidy/" + version;
+            config.userAgent = "Mozilla/5.0 Chrome/10.0.613.0 Safari/534.15 spidy/" + require('../package.json').version;
         }
 
-        const options = {
+        var options = {
+            uri: config.url,
             encoding: config.encoding || "utf8",
             headers: config.headers || {},
             pool: config.pool !== undefined ? config.pool : {
@@ -62,13 +70,14 @@ exports.request = function (url, config, done) {
             method: config.method || 'GET',
             userAgent: config.userAgent,
             formData: config.formData || null,
-            body: config.body || null
+            body: config.body || null,
+            gzip: true,
+            jar: wrapCookieJarForRequest(config.cookieJar)
         };
 
         if (config.proxy) {
             options.proxy = config.proxy;
         }
-
 
         options.headers["User-Agent"] = config.userAgent;
 
@@ -76,37 +85,51 @@ exports.request = function (url, config, done) {
     }
 
     function handleUrl() {
-        config.cookieJar = config.cookieJar || jsdom.createCookieJar();
-        return resourceLoader.download(config.url, createOption(), config.cookieJar, null, function(err, responseText, res) {
+
+        return request(createOption(), function (err, response, responseText) {
             if (err) {
                 reportInitError(err, config);
                 return;
             }
 
-            // The use of `res.request.uri.href` ensures that `window.location.href`
-            // is updated when `request` follows redirects.
-            config.html = responseText;
-            config.url = res.request.uri.href;
+            config.html = responseText || '';
+            config.url = response.request.uri.href;
 
-            if (res.headers["last-modified"]) {
-                config.lastModified = new Date(res.headers["last-modified"]);
+            if (config.parsingMode === "auto" && (
+                response.headers["content-type"] === "application/xml" ||
+                response.headers["content-type"] === "text/xml" ||
+                response.headers["content-type"] === "application/xhtml+xml")) {
+                config.parsingMode = "xml";
             }
 
-            if (config.parsingMode === "auto") {
-                const contentType = parseContentType(res.headers["content-type"]);
-                if (contentType && contentType.isXML()) {
-                    config.parsingMode = "xml";
-                }
+            if (response.headers["last-modified"]) {
+                config.lastModified = new Date(response.headers["last-modified"]);
             }
 
-            if(config.file){
+            if (config.file) {
                 delete config.file;
             }
 
+            var done = config.done;
+
+            config.done = function(err, window){
+                if(done){
+                    if(typeof done !== 'function'){
+                        throw 'done config should be a function' + (typeof done) + ' given instead';
+                    }else{
+                        done(err, window, {
+                            url: config.url,
+                            statusCode: response.statusCode,
+                            headers: response.headers
+                        })
+                    }
+                }
+            };
+
+
             jsdom.env(config);
+
         });
-
-
     }
 
 };
