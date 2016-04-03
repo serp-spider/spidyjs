@@ -18,18 +18,28 @@ function reportInitError(err, config) {
 }
 
 
-exports.request = function (url, config) {
+exports.request = function (url, config, done) {
     let req = null;
-
-    config = config || {};
 
     if (!url) {
         throw "No url specified";
     }
 
+    if(typeof config == 'function'){
+        done = config;
+        config = {};
+    }else{
+        config = config || {};
+    }
+
+    if(done){
+        config.done = done;
+    }
 
     config.url = url;
     req = handleUrl();
+
+    return req;
 
     function createOption() {
 
@@ -98,7 +108,7 @@ exports.request = function (url, config) {
 
 
     }
-    return req;
+
 };
 
 exports.post = function(url, formData, config){
