@@ -25,9 +25,11 @@ exports.request = function (url, config) {
     config.url = url;
     req = handleUrl();
 
+    return req;
+
     function createOption() {
 
-        if(!config.userAgent){
+        if (!config.userAgent) {
             var version = require('../package.json').version;
             config.userAgent = "Mozilla/5.0 Chrome/10.0.613.0 Safari/534.15 spidy/" + version;
         }
@@ -69,8 +71,8 @@ exports.request = function (url, config) {
         config.cookieJar = config.cookieJar || true;
 
 
-
         return request(createOption(), function (err, res, responseText) {
+
             if (err) {
                 reportInitError(err, config);
                 return;
@@ -92,7 +94,7 @@ exports.request = function (url, config) {
                 config.lastModified = new Date(res.headers["last-modified"]);
             }
 
-            if(config.file){
+            if (config.file) {
                 delete config.file;
             }
 
@@ -100,8 +102,7 @@ exports.request = function (url, config) {
         });
 
     }
-    return req;
-};
+}
 
 exports.post = function(url, formData, config){
     config = config || {};
