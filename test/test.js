@@ -40,6 +40,37 @@ describe('Spidy module', function() {
             });
         });
     });
+
+    describe('signature', function () {
+        it('request(url, done)', function (done) {
+            spidy.request('http://httpbin.org/get?foo=bar', function(err, window){
+                if(err){
+                    done('Http call failed');
+                    return false;
+                }else{
+                    var data = JSON.parse(window.document.getElementsByTagName('body')[0].innerHTML);
+                    Object.keys(data.args).should.have.length(1);
+                    data.args['foo'].should.equal('bar');
+                    done();
+                }
+            });
+        });
+
+        it('request(url, config, done)', function (done) {
+            spidy.request('http://httpbin.org/get?foo=bar', {}, function(err, window){
+                if(err){
+                    done('Http call failed');
+                    return false;
+                }else{
+                    var data = JSON.parse(window.document.getElementsByTagName('body')[0].innerHTML);
+                    Object.keys(data.args).should.have.length(1);
+                    data.args['foo'].should.equal('bar');
+                    done();
+                }
+            });
+        });
+    });
+
 });
 
 
