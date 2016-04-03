@@ -12,15 +12,25 @@ function reportInitError(err, config) {
 }
 
 
-exports.request = function (url, config) {
-    var req = null;
 
-    config = config || {};
+
+exports.request = function (url, config, done) {
+    var req = null;
 
     if (!url) {
         throw "No url specified";
     }
 
+    if(typeof config == 'function'){
+        done = config;
+        config = {};
+    }else{
+        config = config || {};
+    }
+
+    if(done){
+        config.done = done;
+    }
 
     config.url = url;
     req = handleUrl();
