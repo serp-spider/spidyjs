@@ -25,7 +25,9 @@
   },
   "dependencies": {
     "jsdom": "^8.2",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "request": "^2.69.0",
+    "tough-cookie": "^2.2.2"
   },
   "devDependencies": {
     "chai": "^3.5.0"
