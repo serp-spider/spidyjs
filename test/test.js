@@ -42,6 +42,45 @@ describe('Spidy module', function() {
         });
     });
 
+
+    describe('config.done', function () {
+        it('response object', function (done) {
+            spidy.request('http://httpbin.org/response-headers?foo=bar&baz=qux', {
+                done: function (err, window, response) {
+
+                    if (err) {
+                        done('Http call failed');
+                        return false;
+                    } else {
+                        response.statusCode.should.equal(200);
+                        response.headers.foo.should.equal('bar');
+                        response.headers.baz.should.equal('qux');
+                        response.url.should.equal('http://httpbin.org/response-headers?foo=bar&baz=qux');
+                        done();
+                    }
+                }
+            });
+        });
+
+        it('redirect + response.url', function (done) {
+            spidy.request('http://httpbin.org/redirect-to?url=/get?foo=bar', {
+                done: function (err, window, response) {
+
+                    if (err) {
+                        done('Http call failed');
+                        return false;
+                    } else {
+                        response.statusCode.should.equal(200);
+                        response.url.should.equal('http://httpbin.org/get?foo=bar');
+                        done();
+                    }
+                }
+            });
+        });
+
+    });
+
+
     describe('signature', function () {
         it('request(url, done)', function (done) {
             spidy.request('http://httpbin.org/get?foo=bar', function(err, window){
@@ -98,7 +137,6 @@ describe('Spidyjs binary', function() {
 
     describe('http method', function() {
 
-
         it('get', function (done) {
             spidyBin(['./test/resources/json_formdata.js', 'http://httpbin.org/get?foo=bar'], function(data, code){
 
@@ -128,7 +166,7 @@ describe('Spidyjs binary', function() {
 
     describe('config', function() {
 
-        it('body', function (done) {
+        it('request body', function (done) {
             spidyBin(['./test/resources/json_body.js', 'http://httpbin.org/post', 'POST', 'foo=bar'], function(data, code){
 
                 code.should.equal(0, data);

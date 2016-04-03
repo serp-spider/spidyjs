@@ -1,6 +1,8 @@
 "use strict";
+
 var jsdom = require('jsdom');
 var request = require('request');
+var CookieJar = require("tough-cookie").CookieJar;
 
 function reportInitError(err, config) {
     if (config.created) {
@@ -12,7 +14,9 @@ function reportInitError(err, config) {
 }
 
 
-
+function createCookieJar () {
+    return new CookieJar(null, { looseMode: true });
+}
 
 exports.request = function (url, config, done) {
     var req = null;
@@ -32,18 +36,24 @@ exports.request = function (url, config, done) {
         config.done = done;
     }
 
+    config.cookieJar = config.cookieJar || createCookieJar();
+
     config.url = url;
     req = handleUrl();
 
     return req;
 
+    function wrapCookieJarForRequest(cookieJar) {
+        var jarWrapper = request.jar();
+        jarWrapper._jar = cookieJar;
+        return jarWrapper;
+    }
+
     function createOption() {
 
-        if (!config.userAgent) {
-            var version = require('../package.json').version;
-            config.userAgent = "Mozilla/5.0 Chrome/10.0.613.0 Safari/534.15 spidy/" + version;
+        if(!config.userAgent){
+            config.userAgent = "Mozilla/5.0 Chrome/10.0.613.0 Safari/534.15 spidy/" + require('../package.json').version;
         }
-
 
         var options = {
             uri: config.url,
@@ -64,13 +74,12 @@ exports.request = function (url, config, done) {
             body: config.body || null,
 
             gzip: true,
-            jar: config.cookieJar
+            jar: wrapCookieJarForRequest(config.cookieJar)
         };
 
         if (config.proxy) {
             options.proxy = config.proxy;
         }
-
 
         options.headers["User-Agent"] = config.userAgent;
 
@@ -78,39 +87,53 @@ exports.request = function (url, config, done) {
     }
 
     function handleUrl() {
-        config.cookieJar = config.cookieJar || true;
-
-
-        return request(createOption(), function (err, res, responseText) {
+        return request(createOption(), function (err, response, responseText) {
 
             if (err) {
                 reportInitError(err, config);
                 return;
             }
 
+
             // The use of `res.request.uri.href` ensures that `window.location.href`
             // is updated when `request` follows redirects.
             config.html = responseText || '';
-            config.url = res.request.uri.href;
+            config.url = response.request.uri.href;
 
             if (config.parsingMode === "auto" && (
-                res.headers["content-type"] === "application/xml" ||
-                res.headers["content-type"] === "text/xml" ||
-                res.headers["content-type"] === "application/xhtml+xml")) {
+                response.headers["content-type"] === "application/xml" ||
+                response.headers["content-type"] === "text/xml" ||
+                response.headers["content-type"] === "application/xhtml+xml")) {
                 config.parsingMode = "xml";
             }
 
-            if (res.headers["last-modified"]) {
-                config.lastModified = new Date(res.headers["last-modified"]);
+            if (response.headers["last-modified"]) {
+                config.lastModified = new Date(response.headers["last-modified"]);
             }
 
             if (config.file) {
                 delete config.file;
             }
 
-            jsdom.env(config);
-        });
+            var done = config.done;
 
+            config.done = function(err, window){
+                if(done){
+                    if(typeof done !== 'function'){
+                        throw 'done config should be a function' + (typeof done) + ' given instead';
+                    }else{
+                        done(err, window, {
+                            url: config.url,
+                            statusCode: response.statusCode,
+                            headers: response.headers
+                        })
+                    }
+                }
+            };
+
+            jsdom.env(config);
+
+        });
     }
 }
 

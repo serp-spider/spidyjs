@@ -58,20 +58,20 @@ Spidy offers the request method with different signatures:
 - ``done`` is a callback triggered when request finishes (see ``config.done`` 
 - ``config`` is an object that can contain the following items (mostly the same that the ones from jsdom):
     - `config.method`: The http method to use (POST, GET, PUT...) default to ``GET``.
-    - `config.proxy`: A proxy to use for the requests with the form: ``http[s]://ip:port``
+    - `config.headers`: an object giving any headers that will be used while loading the HTML from `config.url`, if applicable.
     - `config.formData`: data to be sent with the request, useful for post queries.
     - `config.body`: the http body for ``POST`` or ``PUT`` queries.
-    - `config.cookieJar`: cookie jar which will be used by document and related resource requests. Can be created by `jsdom.createCookieJar()` method. Useful to share cookie state among different documents as browsers does.
+    - `config.proxy`: A proxy to use for the requests with the form: ``http[s]://ip:port``
+    - `config.cookieJar`: cookie jar which will be used by document and related resource requests.
+    - `config.done`: a callback called when the resources has finished loading. See bellow.
     - `config.parsingMode`: either `"auto"`, `"html"`, or `"xml"`. The default is `"auto"`, 
     which uses HTML behavior unless `config.url` responds with an XML `Content-Type`. 
     Setting to `"xml"` will attempt to parse the document as an XHTML document. (jsdom is [currently only OK at doing that](https://github.com/tmpvar/jsdom/issues/885).)
     - `config.referrer`: the new document will have this referrer.
     - `config.cookie`: manually set a cookie value, e.g. `'key=value; expires=Wed, Sep 21 2011 12:00:00 GMT; path=/'`. Accepts cookie string or array of cookie strings.
-    - `config.headers`: an object giving any headers that will be used while loading the HTML from `config.url`, if applicable.
-    - `config.userAgent`: the user agent string used in requests; defaults to `Node.js (#process.platform#; U; rv:#process.version#)`
-    - `config.features`: see Flexibility section below. **Note**: the default feature does _not_ include fetching remote JavaScript and executing it. This is something that you will need to _carefully_ enable yourself.
+    - `config.userAgent`: the user agent string used in requests;
+    - `config.features`: configs to control javascript execution.
     - `config.resourceLoader`: a function that intercepts subresource requests and allows you to re-route them, modify, or outright replace them with your own content. More below.
-    - `config.done`, `config.onload`, `config.created`: 
     [see on jsdom doc](https://github.com/tmpvar/jsdom#initialization-lifecycle). Please note that setting the third parameter will automatically replace ``config.done`` value.
     - `config.concurrentNodeIterators`: the maximum amount of `NodeIterator`s that you can use at the same time. The default is `10`; setting this to a high value will hurt performance.
     - `config.virtualConsole`: a virtual console instance that can capture the window’s console output; 
@@ -101,6 +101,18 @@ spidy.post('http://httpbin.org/post', {'foo': 'bar'}, {
 ``` 
 It's simply a shortcut for ``spidy.request``, and it will set ``config.method = 'POST'`` and ``config.formData = formData``.
 
+
+Done callback
+-------------
+
+The done callback takes 3 parameters:
+
+- `err`: the error message, `null` means that everything was fine.
+- `window`: the window object with the same api as in the browser.
+- `response`: the response object that contains the data from the http response:
+    - `url`: the final url (considering redirects)
+    - `statusCode`: the http status code
+    - `headers`: the headers from the response
 
 
 Enable external resources
