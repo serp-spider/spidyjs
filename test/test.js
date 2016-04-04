@@ -116,7 +116,7 @@ describe('Spidy module', function() {
 describe('Spidyjs binary', function() {
 
     var spidyBin = function(args, done){
-        args.unshift('./src/index.js');
+        args.unshift('./index.js');
         var output = '';
 
         var proc = spawn('node', args, {});

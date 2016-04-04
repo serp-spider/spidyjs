@@ -53,6 +53,14 @@ if(!jsFile){
         process.exit(1);
     }
 
+    // Get the new env (makes require('spidy') available for the script)
+    var env = require('util')._extend(process.env);
+    if(env.NODE_PATH){
+        env.NODE_PATH = env.NODE_PATH + ":" + __dirname + '/src';
+    }else{
+        env.NODE_PATH = __dirname + '/src';
+    }
+
     // Spawn process
     const spawn = require('child_process').spawn;
     var proc = spawn('node', otherArgs);

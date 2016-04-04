@@ -7,7 +7,7 @@
     "test": "mocha"
   },
   "bin": {
-    "spidyjs": "src/index.js"
+    "spidyjs": "./index.js"
   },
   "repository": {
     "type": "git",
