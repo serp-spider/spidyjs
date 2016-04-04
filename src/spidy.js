@@ -19,7 +19,7 @@ function reportInitError(err, config) {
 
 
 exports.request = function (url, config, done) {
-    let req = null;
+    var req = null;
 
     if (!url) {
         throw "No url specified";
@@ -55,10 +55,18 @@ exports.request = function (url, config, done) {
             config.userAgent = "Mozilla/5.0 Chrome/10.0.613.0 Safari/534.15 spidy/" + require('../package.json').version;
         }
 
+        var headers = {};
+
+        if(config.headers){
+            for(var i in config.headers){
+                headers[i.toLowerCase()] = config.headers[i];
+            }
+        }
+
         var options = {
             uri: config.url,
             encoding: config.encoding || "utf8",
-            headers: config.headers || {},
+            headers: headers,
             pool: config.pool !== undefined ? config.pool : {
                 maxSockets: 6
             },
@@ -74,6 +82,9 @@ exports.request = function (url, config, done) {
             gzip: true,
             jar: wrapCookieJarForRequest(config.cookieJar)
         };
+        if(options.body && !options.headers['content-type']){
+            options.headers['content-type'] = 'application/x-www-form-urlencoded';
+        }
 
         if (config.proxy) {
             options.proxy = config.proxy;

@@ -4,7 +4,7 @@ var spawn = require('child_process').spawn;
 
 chai.should();
 
-describe('Spidy module', function() {
+describe('module "spidy" ', function() {
     describe('Http method', function () {
         it('get', function (done) {
             spidy.request('http://httpbin.org/get?foo=bar', {
@@ -42,40 +42,75 @@ describe('Spidy module', function() {
     });
 
 
-    describe('config.done', function () {
-        it('response object', function (done) {
-            spidy.request('http://httpbin.org/response-headers?foo=bar&baz=qux', {
-                done: function (err, window, response) {
+    describe('the config', function () {
+        describe('config.done', function () {
+            it('response object', function (done) {
+                spidy.request('http://httpbin.org/response-headers?foo=bar&baz=qux', {
+                    done: function (err, window, response) {
 
-                    if (err) {
-                        done('Http call failed');
-                        return false;
-                    } else {
-                        response.statusCode.should.equal(200);
-                        response.headers.foo.should.equal('bar');
-                        response.headers.baz.should.equal('qux');
-                        response.url.should.equal('http://httpbin.org/response-headers?foo=bar&baz=qux');
-                        done();
+                        if (err) {
+                            done('Http call failed');
+                            return false;
+                        } else {
+                            response.statusCode.should.equal(200);
+                            response.headers.foo.should.equal('bar');
+                            response.headers.baz.should.equal('qux');
+                            response.url.should.equal('http://httpbin.org/response-headers?foo=bar&baz=qux');
+                            done();
+                        }
                     }
+                });
+            });
+
+            it('redirect & response.url', function (done) {
+                spidy.request('http://httpbin.org/redirect-to?url=/get?foo=bar', {
+                    done: function (err, window, response) {
+
+                        if (err) {
+                            done('Http call failed');
+                            return false;
+                        } else {
+                            response.statusCode.should.equal(200);
+                            response.url.should.equal('http://httpbin.org/get?foo=bar');
+                            done();
+                        }
+                    }
+                });
+            });
+        });
+
+
+        it('body', function(done){
+            spidy.request("http://httpbin.org/post", {
+                method: "POST",
+                body: "foo=bar",
+                done: function(error, window, response){
+                    response.statusCode.should.equal(200);
+                    data = JSON.parse(window.document.getElementsByTagName('body')[0].innerHTML);
+                    Object.keys(data.form).should.have.length(1);
+                    data.form['foo'].should.equal('bar');
+
+                    done();
                 }
             });
         });
 
-        it('redirect + response.url', function (done) {
-            spidy.request('http://httpbin.org/redirect-to?url=/get?foo=bar', {
-                done: function (err, window, response) {
+        it('body + headers["content-type"]', function(done){
+            spidy.request("http://httpbin.org/post", {
+                method: "POST",
+                body: "foo=bar",
+                headers: {'content-type': 'text/plain'},
+                done: function(error, window, response){
+                    response.statusCode.should.equal(200);
+                    data = JSON.parse(window.document.getElementsByTagName('body')[0].innerHTML);
+                    Object.keys(data.form).should.have.length(0);
+                    data.data.should.equal('foo=bar');
 
-                    if (err) {
-                        done('Http call failed');
-                        return false;
-                    } else {
-                        response.statusCode.should.equal(200);
-                        response.url.should.equal('http://httpbin.org/get?foo=bar');
-                        done();
-                    }
+                    done();
                 }
             });
         });
+
 
     });
 
@@ -161,22 +196,6 @@ describe('Spidyjs binary', function() {
                 done();
             });
         });
-    });
-
-    describe('config', function() {
-
-        it('request body', function (done) {
-            spidyBin(['./test/resources/json_body.js', 'http://httpbin.org/post', 'POST', 'foo=bar'], function(data, code){
-
-                code.should.equal(0, data);
-                data = JSON.parse(data);
-                Object.keys(data.form).should.have.length(1);
-                data.form['foo'].should.equal('bar');
-
-                done();
-            });
-        });
-
     });
 
     it('--version flag', function (done) {

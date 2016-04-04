@@ -60,7 +60,8 @@ Spidy offers the request method with different signatures:
     - `config.method`: The http method to use (POST, GET, PUT...) default to ``GET``.
     - `config.headers`: an object giving any headers that will be used while loading the HTML from `config.url`, if applicable.
     - `config.formData`: data to be sent with the request, useful for post queries.
-    - `config.body`: the http body for ``POST`` or ``PUT`` queries.
+    - `config.body`: the http body for ``POST`` or ``PUT`` queries. If body contains some data and if the header `content-type` is not set, 
+    then `application/x-www-form-urlencoded` will be set as content type.
     - `config.proxy`: A proxy to use for the requests with the form: ``http[s]://ip:port``
     - `config.cookieJar`: cookie jar which will be used by document and related resource requests.
     - `config.done`: a callback called when the resources has finished loading. See bellow.
