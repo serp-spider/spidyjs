@@ -1,5 +1,16 @@
 #!/usr/bin/env node
 
+if(process.versions.node.split('.')[0]<4){
+    var node_version = process.versions.node;
+    var spidy_version = require('./package.json').version;
+
+    var msg = 'Error! Your node version (v%s) is not compatible with spidy (v%s). ' +
+        'Please considere updating to node v4 or newer or using spidyjs v1 (npm install -g spidy@1).';
+
+    console.error(require('util').format(msg, node_version, spidy_version));
+    process.exit(1);
+}
+
 var args = process.argv.slice(2);
 
 var jsFile;
@@ -82,7 +93,7 @@ if(!jsFile){
     setTimeout(function(){
         proc.kill();
 
-        console.log(`Timeout of ${timeout/1000}sec reached`);
+        console.log("Timeout of " + (timeout/1000) + "sec reached");
         process.exit(1);
     }, timeout);
 }
