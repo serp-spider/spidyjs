@@ -16,7 +16,7 @@ Install
 It requires nodejs version 4 or newer.
 
 ```js
-npm install -g spidy
+npm install -g spidy@2
 ```
 
 there is a release for older node versions, but it is deprecated.
