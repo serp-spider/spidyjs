@@ -7,7 +7,7 @@
     "test": "mocha"
   },
   "bin": {
-    "spidyjs": "src/index.js"
+    "spidyjs": "./index.js"
   },
   "repository": {
     "type": "git",
@@ -26,7 +26,8 @@
   "dependencies": {
     "jsdom": "^3.1.2",
     "minimist": "^1.2.0",
-    "request": "^2.69"
+    "request": "^2.69",
+    "tough-cookie": "^2.2.2"
   },
   "devDependencies": {
     "chai": "^3.5.0"

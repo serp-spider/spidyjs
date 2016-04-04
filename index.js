@@ -29,7 +29,7 @@ internalArgs = minimist(internalArgs);
 
 // Print version and exit
 if(internalArgs.v || internalArgs.version){
-    var version = require('../package.json').version;
+    var version = require('./package.json').version;
     console.log(version);
     process.exit();
 }
@@ -51,6 +51,14 @@ if(!jsFile){
     catch (e) {
         console.error('File "' + jsFile + '" does not exist.');
         process.exit(1);
+    }
+
+    // Get the new env (makes require('spidy') available for the script)
+    var env = require('util')._extend(process.env);
+    if(env.NODE_PATH){
+        env.NODE_PATH = env.NODE_PATH + ":" + __dirname + '/src';
+    }else{
+        env.NODE_PATH = __dirname + '/src';
     }
 
     // Spawn process

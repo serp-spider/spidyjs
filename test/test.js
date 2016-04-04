@@ -117,7 +117,7 @@ describe('Spidy module', function() {
 describe('Spidyjs binary', function() {
 
     var spidyBin = function(args, done){
-        args.unshift('./src/index.js');
+        args.unshift('./index.js');
         var output = '';
 
         var proc = spawn('node', args, {});
@@ -179,4 +179,20 @@ describe('Spidyjs binary', function() {
         });
 
     });
+
+    it('--version flag', function (done) {
+        spidyBin(['--version'], function(data, code){
+            code.should.equal(0, data);
+            data.trim().should.equal(require('../package.json').version);
+            done();
+        });
+    });
+    it('-v flag', function (done) {
+        spidyBin(['-v'], function(data, code){
+            code.should.equal(0, data);
+            data.trim().should.equal(require('../package.json').version);
+            done();
+        });
+    });
+
 });
