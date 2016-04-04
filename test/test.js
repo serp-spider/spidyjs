@@ -178,4 +178,20 @@ describe('Spidyjs binary', function() {
         });
 
     });
+
+    it('--version flag', function (done) {
+        spidyBin(['--version'], function(data, code){
+            code.should.equal(0, data);
+            data.trim().should.equal(require('../package.json').version);
+            done();
+        });
+    });
+    it('-v flag', function (done) {
+        spidyBin(['-v'], function(data, code){
+            code.should.equal(0, data);
+            data.trim().should.equal(require('../package.json').version);
+            done();
+        });
+    });
+
 });
