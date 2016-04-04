@@ -1,6 +1,6 @@
 {
   "name": "spidy",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Dead simple wrapper arround jsdom to offer a different headless browser experience",
   "main": "src/spidy.js",
   "scripts": {
